@@ -7,6 +7,8 @@ import com.ibiker.ibiker.Models.Error;
 import com.ibiker.ibiker.Models.Token;
 import com.ibiker.ibiker.Models.User;
 import com.ibiker.ibiker.Repositories.UsersRepository;
+
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,7 @@ public class LoginController {
     private static final String SECRET_KEY = getSecretKey();
 
     @PostMapping
-    public ResponseEntity login(@Valid @RequestBody AuthData authData, Errors errors) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthData authData, Errors errors) {
 
         if (errors.hasErrors()) {
             return new ResponseEntity<>(new Error("An error occurred."), HttpStatus.BAD_REQUEST);
@@ -48,9 +50,12 @@ public class LoginController {
         } else if (!passwordEncoder.matches(authData.getUserPassword(), user.getPassword())) {
             return new ResponseEntity<>(new Error("Password is incorrect."), HttpStatus.UNAUTHORIZED);
         }
+        
+        String userID = user.getId().toString();
 
         final String token = JWT.create()
                 .withSubject(user.getEmail())
+                .withIssuer(userID)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_OFFSET))
                 .sign(Algorithm.HMAC512(SECRET_KEY.getBytes()));
 
@@ -68,6 +73,8 @@ public class LoginController {
             while ((bufferedReader.readLine()) != null) {
                 secretKey.append(bufferedReader.readLine());
             }
+            
+            bufferedReader.close();  
         } catch (Exception e) {
             e.printStackTrace();
         }
