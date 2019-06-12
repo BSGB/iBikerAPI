@@ -4,15 +4,23 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Document(collection = "routes")
 public class Route {
 	
-    @Id
-    private ObjectId _id;
+	@Id
+	@JsonIgnore
+	private ObjectId id;
+	
+	@Transient
+	private String stringifiedId;
 
-	private String userID;
+	private String userId;
 	private boolean isPublished;
 	private Long startTimeStamp;
 	private Long endTimeStamp;
@@ -21,15 +29,21 @@ public class Route {
 	private List<LatLng> waypoints;
 	private List<Float> averages;
 	private List<RouteStop> stops;
+	private String description;
+	private Float difficulty;
+	private String bikeType;
 	private List<UserComment> comments;
 	
 	public Route() {
 	}
 	
-	public Route(ObjectId id, String userID, boolean isPublished, Long startTimeStamp, Long endTimeStamp, Long deltaTime, Float totalDistance,
-			List<LatLng> waypoints, List<Float> averages, List<RouteStop> stops, List<UserComment> comments) {
-		this._id = id;
-		this.userID = userID;
+	public Route(ObjectId id, String stringifiedId, String userId, boolean isPublished, Long startTimeStamp, Long endTimeStamp,
+			Long deltaTime, Float totalDistance, List<LatLng> waypoints, List<Float> averages, List<RouteStop> stops, String description, Float difficulty,
+			String bikeType, List<UserComment> comments) {
+		super();
+		this.id = id;
+		this.stringifiedId = stringifiedId;
+		this.userId = userId;
 		this.isPublished = isPublished;
 		this.startTimeStamp = startTimeStamp;
 		this.endTimeStamp = endTimeStamp;
@@ -38,79 +52,82 @@ public class Route {
 		this.waypoints = waypoints;
 		this.averages = averages;
 		this.stops = stops;
+		this.description = description;
+		this.difficulty = difficulty;
+		this.bikeType = bikeType;
 		this.comments = comments;
 	}
-	
-	public ObjectId get_id() {
-		return _id;
+
+	public ObjectId getId() {
+		return id;
 	}
 
-	public void set_id(ObjectId _id) {
-		this._id = _id;
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
-	
-	public String getUserID() {
-		return userID;
+
+	public String getStringifiedId() {
+		return stringifiedId;
 	}
-	
-	public void setUserID(String userID) {
-		this.userID = userID;
+
+	public void setStringifiedId(String stringifiedId) {
+		this.stringifiedId = stringifiedId;
 	}
-	
-	public boolean isPublished() {
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public boolean getIsPublished() {
 		return isPublished;
 	}
-	
-	public void setPublished(boolean isPublished) {
+
+	public void setIsPublished(boolean isPublished) {
 		this.isPublished = isPublished;
 	}
-	
-	public Long getStartTime() {
+
+	public Long getStartTimeStamp() {
 		return startTimeStamp;
 	}
-	
-	public void setStartTime(Long startTime) {
-		this.startTimeStamp = startTime;
+
+	public void setStartTimeStamp(Long startTimeStamp) {
+		this.startTimeStamp = startTimeStamp;
 	}
-	
-	public Long getEndTime() {
+
+	public Long getEndTimeStamp() {
 		return endTimeStamp;
 	}
-	
-	public void setEndTime(Long endTime) {
-		this.endTimeStamp = endTime;
+
+	public void setEndTimeStamp(Long endTimeStamp) {
+		this.endTimeStamp = endTimeStamp;
 	}
-	
-	public Long getTimeDelta() {
+
+	public Long getDeltaTime() {
 		return deltaTime;
 	}
-	
-	public void setTimeDelta(Long timeDelta) {
-		this.deltaTime = timeDelta;
+
+	public void setDeltaTime(Long deltaTime) {
+		this.deltaTime = deltaTime;
 	}
-	
+
+	public Float getTotalDistance() {
+		return totalDistance;
+	}
+
+	public void setTotalDistance(Float totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+
 	public List<LatLng> getWaypoints() {
 		return waypoints;
 	}
-	
+
 	public void setWaypoints(List<LatLng> waypoints) {
 		this.waypoints = waypoints;
-	}
-	
-	public List<RouteStop> getStops() {
-		return stops;
-	}
-	
-	public void setStops(List<RouteStop> stops) {
-		this.stops = stops;
-	}
-	
-	public List<UserComment> getComments() {
-		return comments;
-	}
-	
-	public void setComments(List<UserComment> comments) {
-		this.comments = comments;
 	}
 
 	public List<Float> getAverages() {
@@ -121,11 +138,43 @@ public class Route {
 		this.averages = averages;
 	}
 
-	public Float getTotalDistance() {
-		return totalDistance;
+	public List<RouteStop> getStops() {
+		return stops;
 	}
 
-	public void setTotalDistance(Float totalDistance) {
-		this.totalDistance = totalDistance;
+	public void setStops(List<RouteStop> stops) {
+		this.stops = stops;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public Float getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(Float difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	public String getBikeType() {
+		return bikeType;
+	}
+
+	public void setBikeType(String bikeType) {
+		this.bikeType = bikeType;
+	}
+
+	public List<UserComment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<UserComment> comments) {
+		this.comments = comments;
 	}
 }

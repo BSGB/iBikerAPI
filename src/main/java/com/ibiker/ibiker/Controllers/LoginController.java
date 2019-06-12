@@ -2,6 +2,7 @@ package com.ibiker.ibiker.Controllers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.ibiker.ibiker.JWTSecretKeyProvider;
 import com.ibiker.ibiker.Models.AuthData;
 import com.ibiker.ibiker.Models.Error;
 import com.ibiker.ibiker.Models.Token;
@@ -32,9 +33,8 @@ public class LoginController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private static final Long EXPIRATION_OFFSET = 600_000L;
-    private static final String SECRET_FILE_NAME = "jwt_secret_key";
-    private static final String SECRET_KEY = getSecretKey();
+    private static final Long EXPIRATION_OFFSET = 600_000_0L;
+    private static final String SECRET_KEY = JWTSecretKeyProvider.getSecretKey();
 
     @PostMapping
     public ResponseEntity<?> login(@Valid @RequestBody AuthData authData, Errors errors) {
@@ -60,25 +60,5 @@ public class LoginController {
                 .sign(Algorithm.HMAC512(SECRET_KEY.getBytes()));
 
         return new ResponseEntity<>(new Token(token), HttpStatus.OK);
-    }
-
-    private static String getSecretKey() {
-        final File file = new File(SECRET_FILE_NAME + ".txt");
-        StringBuilder secretKey = new StringBuilder();
-
-        try {
-            final FileReader fileReader = new FileReader(file);
-            final BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while ((bufferedReader.readLine()) != null) {
-                secretKey.append(bufferedReader.readLine());
-            }
-            
-            bufferedReader.close();  
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return secretKey.toString();
     }
 }
