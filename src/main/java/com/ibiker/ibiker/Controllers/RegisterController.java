@@ -4,6 +4,7 @@ import com.ibiker.ibiker.Models.AuthData;
 import com.ibiker.ibiker.Models.Error;
 import com.ibiker.ibiker.Models.User;
 import com.ibiker.ibiker.Repositories.UsersRepository;
+import com.ibiker.ibiker.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -22,11 +23,11 @@ import javax.validation.Valid;
 @RequestMapping("/api/register")
 public class RegisterController {
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public RegisterController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public ResponseEntity register(@Valid @RequestBody AuthData authData, Errors errors) {
@@ -35,10 +36,10 @@ public class RegisterController {
             return new ResponseEntity<>(new Error("An error occurred."), HttpStatus.BAD_REQUEST);
         }
 
-        final User user = new User(ObjectId.get(), authData.getUserEmail(), passwordEncoder.encode(authData.getUserPassword()), System.currentTimeMillis());
+        final User user;
 
         try {
-            usersRepository.save(user);
+            user = userService.registerUser(authData);
         } catch (DuplicateKeyException e) {
             return new ResponseEntity<>(new Error("Email is already in use."), HttpStatus.CONFLICT);
         }

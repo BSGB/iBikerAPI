@@ -9,5 +9,4 @@ import com.ibiker.ibiker.Models.Route;
 
 public interface RoutesRepository extends MongoRepository<Route, String> {
 	List<Route> findAllByUserId(String userId);
-	Optional<Route> findById(String id);
 }

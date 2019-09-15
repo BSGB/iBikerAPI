@@ -1,43 +1,43 @@
 package com.ibiker.ibiker.Models;
 
 public class UserComment {
-	private String userID;
+	private String userId;
 	private Long publishTimeStamp;
 	private String commentText;
-	private byte rating;
+	private float rating;
 	
 	public UserComment() {
 	}
 	
-	public UserComment(String userID, Long publishTimeStamp, String commentText, byte rating) {
+	public UserComment(String userId, Long publishTimeStamp, String commentText, byte rating) {
 		super();
-		this.userID = userID;
+		this.userId = userId;
 		this.publishTimeStamp = publishTimeStamp;
 		this.commentText = commentText;
 		this.rating = rating;
 	}
 	
-	public byte getRating() {
+	public float getRating() {
 		return rating;
 	}
 	
-	public void setRating(byte rating) {
+	public void setRating(float rating) {
 		this.rating = rating;
 	}
 	
-	public String getUserID() {
-		return userID;
+	public String getUserId() {
+		return userId;
 	}
 	
-	public void setUserID(String userID) {
-		this.userID = userID;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
-	public Long getPublishTime() {
+	public Long getPublishTimeStamp() {
 		return publishTimeStamp;
 	}
 	
-	public void setPublishTime(Long publishTime) {
+	public void setPublishTimeStamp(Long publishTime) {
 		this.publishTimeStamp = publishTime;
 	}
 	

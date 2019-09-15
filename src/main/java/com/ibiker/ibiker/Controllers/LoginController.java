@@ -1,37 +1,32 @@
 package com.ibiker.ibiker.Controllers;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.ibiker.ibiker.Exceptions.UserNotFoundException;
+import com.ibiker.ibiker.Exceptions.WrongPasswordException;
 import com.ibiker.ibiker.JWTSecretKeyProvider;
+import com.ibiker.ibiker.UserService;
 import com.ibiker.ibiker.Models.AuthData;
 import com.ibiker.ibiker.Models.Error;
 import com.ibiker.ibiker.Models.Token;
-import com.ibiker.ibiker.Models.User;
-import com.ibiker.ibiker.Repositories.UsersRepository;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {
 
-    @Autowired
-    private UsersRepository usersRepository;
+
+    private final UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public LoginController(UserService userService) {
+        this.userService = userService;
+    }
 
     private static final Long EXPIRATION_OFFSET = 600_000_0L;
     private static final String SECRET_KEY = JWTSecretKeyProvider.getSecretKey();
@@ -43,21 +38,15 @@ public class LoginController {
             return new ResponseEntity<>(new Error("An error occurred."), HttpStatus.BAD_REQUEST);
         }
 
-        final User user = usersRepository.findUserByEmail(authData.getUserEmail());
+        final String token;
 
-        if (user == null) {
-            return new ResponseEntity<>(new Error("No user corresponding to this email."), HttpStatus.NOT_FOUND);
-        } else if (!passwordEncoder.matches(authData.getUserPassword(), user.getPassword())) {
-            return new ResponseEntity<>(new Error("Password is incorrect."), HttpStatus.UNAUTHORIZED);
+        try {
+            token = userService.loginUser(authData, EXPIRATION_OFFSET, SECRET_KEY);
+        } catch (UserNotFoundException userNotFound) {
+            return new ResponseEntity<>(new Error(userNotFound.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (WrongPasswordException wrongPassword) {
+            return new ResponseEntity<>(new Error(wrongPassword.getMessage()), HttpStatus.UNAUTHORIZED);
         }
-        
-        String userID = user.getId().toString();
-
-        final String token = JWT.create()
-                .withSubject(user.getEmail())
-                .withIssuer(userID)
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_OFFSET))
-                .sign(Algorithm.HMAC512(SECRET_KEY.getBytes()));
 
         return new ResponseEntity<>(new Token(token), HttpStatus.OK);
     }
